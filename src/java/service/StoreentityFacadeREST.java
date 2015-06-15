@@ -34,49 +34,6 @@ public class StoreentityFacadeREST extends AbstractFacade<Storeentity> {
         super(Storeentity.class);
     }
 
-    @POST
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void create(Storeentity entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Path("{id}")
-    @Consumes({"application/xml", "application/json"})
-    public void edit(@PathParam("id") Long id, Storeentity entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Long id) {
-        super.remove(super.find(id));
-    }
-
-    @GET
-    @Path("{id}")
-    @Produces({"application/xml", "application/json"})
-    public Storeentity find(@PathParam("id") Long id) {
-        return super.find(id);
-    }
-
-    @GET
-    @Path("stores")
-    @Produces({"application/json"})
-    public List<Storeentity> listAllStores() {
-        Query q = em.createQuery("Select s from Storeentity s where s.isdeleted=FALSE and s.countryId.name='Singapore'");
-        List<Storeentity> list = q.getResultList();
-        for (Storeentity s : list) {
-            em.detach(s);
-            s.setCountryId(null);
-            s.setRegionalofficeId(null);
-            s.setWarehouseId(null);
-        }
-        List<Storeentity> list2 = new ArrayList();
-        list2.add(list.get(0));
-        return list;
-    }
 
     //get the item quantity based on the storeID
     //this function is used by ECommerce_StockAvailability servlet
