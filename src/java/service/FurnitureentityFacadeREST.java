@@ -81,14 +81,13 @@ public class FurnitureentityFacadeREST extends AbstractFacade<Furnitureentity> {
     public String countREST() {
         return String.valueOf(super.count());
     }
-    
-    //Display a list of all the furniture
-    //this function is not used in the student's copy, can be found in the ECommerce_AllFurnituresServlet of Lecturer's copy
+
     @GET
-    @Path("getFurnitureList")
+    @Path("getFurnitureListByCategory")
     @Produces("application/json")
-    public Response getFurnitureList(@QueryParam("countryID") Long countryID) {
-        System.out.println("RESTful: getFurnitureList() called with countryID " + countryID);
+    public Response getFurnitureListByCategory(@QueryParam("countryID") Long countryID, @QueryParam("category") String category) {
+        System.out.println("RESTful: getFurnitureListByCategory() called with countryID " + countryID + " and category " + category);
+
         try {
             List<Furniture> list = new ArrayList<>();
             String stmt = "";
@@ -96,14 +95,15 @@ public class FurnitureentityFacadeREST extends AbstractFacade<Furnitureentity> {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
 
             if (countryID == null) {
-                stmt = "SELECT i.ID as id, i.NAME as name, f.IMAGEURL as imageURL, i.SKU as sku, i.DESCRIPTION as description, i.TYPE as type, i._LENGTH as length, i.WIDTH as width, i.HEIGHT as height, i.CATEGORY as category FROM itementity i, furnitureentity f where i.ID=f.ID and i.ISDELETED=FALSE;";
+                stmt = "SELECT i.ID as id, i.NAME as name, f.IMAGEURL as imageURL, i.SKU as sku, i.DESCRIPTION as description, i.TYPE as type, i._LENGTH as length, i.WIDTH as width, i.HEIGHT as height, i.CATEGORY as category FROM itementity i, furnitureentity f where i.ID=f.ID and i.ISDELETED=FALSE and i.CATEGORY=?;";
                 ps = conn.prepareStatement(stmt);
+                ps.setString(1, category);
             } else {
-                stmt = "SELECT i.ID as id, i.NAME as name, f.IMAGEURL as imageURL, i.SKU as sku, i.DESCRIPTION as description, i.TYPE as type, i._LENGTH as length, i.WIDTH as width, i.HEIGHT as height, i.CATEGORY as category, ic.RETAILPRICE as price FROM itementity i, furnitureentity f, item_countryentity ic where i.ID=f.ID and i.ID=ic.ITEM_ID and i.ISDELETED=FALSE and ic.COUNTRY_ID=?;";
+                stmt = "SELECT i.ID as id, i.NAME as name, f.IMAGEURL as imageURL, i.SKU as sku, i.DESCRIPTION as description, i.TYPE as type, i._LENGTH as length, i.WIDTH as width, i.HEIGHT as height, i.CATEGORY as category, ic.RETAILPRICE as price FROM itementity i, furnitureentity f, item_countryentity ic where i.ID=f.ID and i.ID=ic.ITEM_ID and i.ISDELETED=FALSE and ic.COUNTRY_ID=? and i.CATEGORY=?;";
                 ps = conn.prepareStatement(stmt);
                 ps.setLong(1, countryID);
+                ps.setString(2, category);
             }
-
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Furniture f = new Furniture();
